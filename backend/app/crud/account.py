@@ -3,8 +3,13 @@ from app.models.account import Account
 from app.schemas.account import AccountCreate
 
 
-def create_account(db: Session, account: AccountCreate) -> Account:
-    db_account = Account(**account.dict())
+def create_account(db: Session, account: AccountCreate, family_member_id: int) -> Account:
+    db_account = Account(
+        name=account.name,
+        balance=account.balance,
+        currency=account.currency,
+        family_member_id=family_member_id
+    )
     db.add(db_account)
     db.commit()
     db.refresh(db_account)

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, validator
-from typing import Optional
+from typing import Optional, Dict
 from enum import Enum
 
 
@@ -13,18 +13,22 @@ class AccountBase(BaseModel):
     name: str = Field(..., min_length=2, max_length=50)
     currency: Currency = Currency.RUB
     balance: float = Field(ge=0)
+    family_id: int
 
 
 class AccountCreate(AccountBase):
     family_member_id: int
 
-    @validator('balance')
-    def round_balance(cls, v):
-        return round(v, 2)
-
 
 class AccountResponse(AccountBase):
     id: int
+
+    class Config:
+        orm_mode = True
+
+
+class FamilyBalancesResponse(BaseModel):
+    balances: Dict[str, float]  # Ключ - валюта, значение - сумма
 
     class Config:
         orm_mode = True

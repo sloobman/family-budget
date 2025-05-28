@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, Float, String, DateTime, ForeignKey, Enu
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.db import Base
-
+from app.models.family_member import FamilyMember
 
 class Transaction(Base):
     __tablename__ = "transactions"
@@ -15,4 +15,6 @@ class Transaction(Base):
     description = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    family_member_id = Column(Integer, ForeignKey("family_members.id"), nullable=False)
     account = relationship("Account", back_populates="transactions")
+    family_member = relationship("FamilyMember")

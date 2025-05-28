@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Wallet } from 'lucide-react';
-import { authAPI } from '../api/client';
+import { authAPI, familyAPI } from '../api/client';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -12,28 +13,51 @@ const Register = () => {
     password: '',
     confirmPassword: '',
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | string[]>('');
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
+  e.preventDefault();
+  if (formData.password !== formData.confirmPassword) {
+    setError('Passwords do not match');
+    return;
+  }
+  
+  try {
+    // 1. Регистрируем пользователя как родителя
+    const userResponse = await authAPI.register({
+      email: formData.email,
+      username: formData.username,
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      password: formData.password,
+      is_parent: true
+    });
+
+    // 2. Создаем семью
+    const familyResponse = await familyAPI.createFamily({
+      name: `${formData.firstName}'s Family`
+    });
+
+    // 3. Добавляем пользователя как члена семьи
+    await familyAPI.createFamilyMember({
+      name: `${formData.firstName} ${formData.lastName}`,
+      relation: "parent",
+      user_id: userResponse.data.id,
+      family_id: familyResponse.data.id
+    });
+
+    navigate('/login');
+  } catch (error: any) {
+    const detail = error.response?.data?.detail;
+    if (Array.isArray(detail)) {
+      setError(detail.map((d: any) => d.msg));
+    } else {
+      setError(detail || 'Registration failed. Please try again.');
     }
-    try {
-      await authAPI.register({
-        email: formData.email,
-        password: formData.password,
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        username: formData.username,
-      });
-      navigate('/login');
-    } catch {
-      setError('Registration failed. Please try again.');
-    }
-  };
+  }
+};
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -149,10 +173,19 @@ const Register = () => {
             </div>
           </div>
           {error && (
-            <div className="text-red-600 text-sm text-center">
-              {error}
+            <div className="text-red-600 text-sm">
+              {Array.isArray(error) ? (
+                <ul className="list-disc pl-5">
+                  {error.map((e, index) => (
+                    <li key={index}>{e}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>{error}</p>
+              )}
             </div>
           )}
+
           <div>
             <button
               type="submit"

@@ -2,6 +2,9 @@ from pydantic import BaseModel, EmailStr, field_validator, Field
 from datetime import datetime
 
 
+class UserUpdateFamily(BaseModel):
+    family_id: int | None
+
 class UserBase(BaseModel):
     email: EmailStr
     username: str = Field(..., min_length=2, max_length=50)
@@ -11,6 +14,8 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str = Field(..., min_length=8)
+    is_parent: bool = Field(default=False)
+
 
     @field_validator('password')
     def validate_password(cls, v: str) -> str:
@@ -37,4 +42,5 @@ class UserResponse(UserBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # Вместо orm_mode = True
+

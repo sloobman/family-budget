@@ -11,6 +11,8 @@ import Goals from './pages/Goals';
 import Savings from './pages/Savings';
 import Expenses from './pages/Expenses';
 import FamilyMembers from './pages/FamilyMembers';
+import AddAccountForm from './pages/AddAccountForm';
+import AddFamilyMember from './pages/AddFamilyMember';
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
         <Route path="/savings" element={<Savings />} />
         <Route path="/expenses" element={<Expenses />} />
         <Route path="/family" element={<FamilyMembers />} />
+        <Route path="/add-account" element={<AddAccountForm />} />
+        <Route path="/add-family-member" element={<AddFamilyMember />} />
       </Routes>
     </Router>
   );

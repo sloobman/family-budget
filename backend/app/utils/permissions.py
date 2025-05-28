@@ -8,12 +8,18 @@ from fastapi.security import OAuth2PasswordBearer
 from app.utils.auth import get_current_user
 
 
-def check_family_access(member_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    member = db.query(FamilyMember).filter(FamilyMember.id == member_id).first()
-    if not member or member.family_id != current_user.family_id:
-        raise HTTPException(status_code=403, detail="No access to this family member")
-    return member
+def check_family_access(
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+) -> FamilyMember:
+    """Проверяет, что пользователь - член семьи"""
+    member = db.query(FamilyMember).filter(
+        FamilyMember.user_id == current_user.id
+    ).first()
 
+    if not member:
+        raise HTTPException(status_code=403, detail="User is not a family member")
+    return member
 
 def check_account_access(
     account_id: int,
@@ -27,6 +33,6 @@ def check_account_access(
 
 
 def check_admin_access(current_user: User = Depends(get_current_user)) -> User:
-    if not current_user.is_admin:
+    if not current_user.is_parent:
         raise HTTPException(status_code=403, detail="Admin access required")
     return current_user

@@ -17,7 +17,7 @@ async def handle_insufficient_funds(request, exc):
     )
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React по умолчанию на 3000 порту
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -25,11 +25,11 @@ app.add_middleware(
 
 Base.metadata.create_all(bind=engine)
 
-app.include_router(family.router)
-app.include_router(accounts.router)
-app.include_router(income.router)
-app.include_router(auth.router)
-app.include_router(family_members.router)
-app.include_router(transactions.router)
-app.include_router(users.router)
+app.include_router(family.router, prefix="/api")
+app.include_router(accounts.router, prefix="/api")
+app.include_router(income.router, prefix="/api")
+app.include_router(auth.router, prefix="/api")
+app.include_router(family_members.router, prefix="/api")
+app.include_router(transactions.router, prefix="/api")
+app.include_router(users.router, prefix="/api")
 

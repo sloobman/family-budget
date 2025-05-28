@@ -10,9 +10,9 @@ from app.schemas.user import TokenData
 from app.db import get_db
 
 # Константы для JWT
-SECRET_KEY = secrets.token_urlsafe(32)
+SECRET_KEY = "Ltk_BSR0lmyGs-135-lc7baz1K9kygR6aHrk4lN4ATQ"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 1200
 
 # Контекст для хэширования паролей
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -40,6 +40,8 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
+    print(f"Used SECRET_KEY: {SECRET_KEY}")
+    print(f"Used ALGORITHM: {ALGORITHM}")
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
@@ -51,16 +53,18 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     )
 
     try:
+        print(f"Used SECRET_KEY: {SECRET_KEY}")
+        print(f"Used ALGORITHM: {ALGORITHM}")
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str | None = payload.get("sub")
         if username is None:
             raise credentials_exception
         token_data = TokenData(username=username)
-    except JWTError:
+    except JWTError as e:
+        print(f"JWT Error: {str(e)}")
         raise credentials_exception
 
     user = db.query(User).filter(User.username == token_data.username).first()
     if user is None:
         raise credentials_exception
-
     return user
