@@ -119,7 +119,28 @@ export interface UserData {
   password: string;
 }
 
+export interface GoalResponse {
+  id: number;
+  title: string;
+  amount: number;
+  description?: string;
+}
+
+export interface CreateGoalRequest {
+  title: string;
+  amount: number;
+  description?: string;
+}
+
 // API
+
+export const goalAPI = {
+  getGoals: () => api.get<GoalResponse[]>('/goals'),
+  getTotalGoals: () => api.get<{ total_amount: number }>('/goals/total_amount'),
+  createGoal: (data: CreateGoalRequest) => api.post<GoalResponse>('/goals', data),
+  deleteGoal: (id: number) => api.delete(`/goals/${id}`),
+
+};
 
 export const authAPI = {
   register: (data: RegisterData) => api.post('/auth/register', data),
@@ -170,6 +191,12 @@ export const transactionAPI = {
   createTransaction: (data: TransactionData) => api.post('/transactions/', data),
   getTransactions: () => api.get<TransactionData[]>('/transactions/'),
   getTransaction: (id: number) => api.get<TransactionData>(`/transactions/${id}`),
+  exportTransactions: () =>
+  api.get('/transactions/export', {
+    responseType: 'blob',  // важно, чтобы получить файл
+  }),
+  getTotalIncome: () => api.get<{ total_income: number }>('/transactions/income/total'),
+  getTotalExpense: () => api.get<{ total_expense: number }>('/transactions/expense/total'),
 };
 
 export const userAPI = {

@@ -12,7 +12,7 @@ class Currency(str, Enum):
 class AccountBase(BaseModel):
     name: str = Field(..., min_length=2, max_length=50)
     currency: Currency = Currency.RUB
-    balance: float = Field(ge=0)
+    balance: float = Field()
     family_id: int
 
 

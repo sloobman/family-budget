@@ -68,7 +68,7 @@ const AddAccountForm = () => {
       await accountAPI.createAccount({
         name: formData.name,
         balance: parseFloat(formData.balance),
-        currency: formData.currency as 'RUB' | 'USD' | 'EUR',
+        currency: 'RUB',
         family_id: userFamily.data.id,
         family_member_id: parseInt(formData.family_member_id)
         
@@ -152,44 +152,25 @@ const AddAccountForm = () => {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="balance" className="block text-sm font-medium text-gray-700 mb-1">
-                  Начальный баланс
-                </label>
-                <input
-                  type="number"
-                  id="balance"
-                  name="balance"
-                  value={formData.balance}
-                  onChange={handleChange}
-                  required
-                  step="0.01"
-                  min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="0.00"
-                />
-              </div>
 
-              <div>
-                <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-1">
-                  Валюта
-                </label>
-                <select
-                  id="currency"
-                  name="currency"
-                  value={formData.currency}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  {currencies.map((currency) => (
-                    <option key={currency.value} value={currency.value}>
-                      {currency.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div>
+              <label htmlFor="balance" className="block text-sm font-medium text-gray-700 mb-1">
+                Начальный баланс
+              </label>
+              <input
+                type="number"
+                id="balance"
+                name="balance"
+                value={formData.balance}
+                onChange={handleChange}
+                required
+                step="0.01"
+                min="0"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="0.00"
+              />
             </div>
+
 
             <div className="pt-4">
               <button

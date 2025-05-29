@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
@@ -13,6 +12,7 @@ import Expenses from './pages/Expenses';
 import FamilyMembers from './pages/FamilyMembers';
 import AddAccountForm from './pages/AddAccountForm';
 import AddFamilyMember from './pages/AddFamilyMember';
+import AddGoalPage from './pages/AddGoalPage';
 
 function App() {
   return (
@@ -31,6 +31,7 @@ function App() {
         <Route path="/family" element={<FamilyMembers />} />
         <Route path="/add-account" element={<AddAccountForm />} />
         <Route path="/add-family-member" element={<AddFamilyMember />} />
+        <Route path="/add-goal" element={<AddGoalPage />} />
       </Routes>
     </Router>
   );

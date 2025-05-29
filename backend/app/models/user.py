@@ -17,5 +17,6 @@ class User(Base):
     is_parent = Column(Boolean, default=False)
     family_id = Column(Integer, ForeignKey('families.id'), nullable=True)  # Добавьте это
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    
     family = relationship("Family", back_populates="users")
     family_members = relationship("FamilyMember", back_populates="user")

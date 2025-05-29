@@ -20,11 +20,6 @@ def create_account(
     db: Session = Depends(get_db),
     member: FamilyMember = Depends(check_family_access)
 ):
-    if account.family_member_id != member.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only create accounts for yourself"
-        )
     db_account = Account(
         name=account.name,
         balance=account.balance,

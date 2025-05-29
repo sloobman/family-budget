@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from 'react';
-import { Wallet, CreditCard, Banknote, Landmark, Home } from 'lucide-react';
+import { Wallet, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { accountAPI, AccountResponse} from '../api/client';
 
@@ -26,31 +25,6 @@ const PersonalAccounts = () => {
 
     fetchAccounts();
   }, []);
-
-  const getAccountIcon = (type: string) => {
-    switch (type) {
-      case 'cash':
-        return <Wallet className="h-6 w-6 text-blue-500" />;
-      case 'card':
-        return <CreditCard className="h-6 w-6 text-purple-500" />;
-      case 'bank':
-        return <Landmark className="h-6 w-6 text-green-500" />;
-      case 'investment':
-        return <Banknote className="h-6 w-6 text-yellow-500" />;
-      default:
-        return <Wallet className="h-6 w-6 text-gray-500" />;
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ru-RU', {
-      day: 'numeric',
-      month: 'long',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -115,19 +89,7 @@ const PersonalAccounts = () => {
                       
                     </div>
                   </div>
-                  <div className="bg-gray-50 px-6 py-4">
-                    <div className="flex space-x-3">
-                      <button className="text-sm font-medium text-blue-600 hover:text-blue-500">
-                        Перевести
-                      </button>
-                      <button className="text-sm font-medium text-gray-600 hover:text-gray-500">
-                        История
-                      </button>
-                      <button className="text-sm font-medium text-gray-600 hover:text-gray-500">
-                        Настройки
-                      </button>
-                    </div>
-                  </div>
+                  
                 </div>
               ))
             ) : (

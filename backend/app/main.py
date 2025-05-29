@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from starlette.responses import JSONResponse
-
+from routers import goals
 from app.routers import family, accounts, income, auth, family_members, transactions, users, categories
 from app.db import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,6 +25,8 @@ app.add_middleware(
 
 Base.metadata.create_all(bind=engine)
 
+
+
 app.include_router(family.router, prefix="/api")
 app.include_router(accounts.router, prefix="/api")
 app.include_router(income.router, prefix="/api")
@@ -33,4 +35,5 @@ app.include_router(family_members.router, prefix="/api")
 app.include_router(transactions.router, prefix="/api")
 app.include_router(users.router, prefix="/api")
 app.include_router(categories.router, prefix="/api")
+app.include_router(goals.router, prefix="/api")
 

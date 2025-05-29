@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import { Dialog } from "@headlessui/react";
@@ -15,10 +14,10 @@ const TransactionForm = ({ isOpen, onClose, onSuccess }: Props) => {
   const [accounts, setAccounts] = useState<{id: number; name: string}[]>([]);
   const [amount, setAmount] = useState(0);
   const [type, setType] = useState<'income' | 'expense'>('income');
-  const [category, setCategory] = useState("");
   const [accountId, setAccountId] = useState<number | "">("");
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
+   const [errorMessage, setErrorMessage] = useState<string>("");
   useEffect(() => { 
     const fetchAccounts = async () => {
       try {
@@ -33,7 +32,6 @@ const TransactionForm = ({ isOpen, onClose, onSuccess }: Props) => {
           const userResponse = await userAPI.getCurrentUser();
           const familyId = userResponse.data.family_id;
           const response = await categoryAPI.getCategories(familyId);
-          console.log(response.data);
           setCategories(response.data);
         } catch (error) {
           console.error('Error fetching categories:', error);
@@ -46,6 +44,7 @@ const TransactionForm = ({ isOpen, onClose, onSuccess }: Props) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage("");
     if (!accountId) {
       alert("Пожалуйста, выберите счёт");
       return;
@@ -64,9 +63,16 @@ const TransactionForm = ({ isOpen, onClose, onSuccess }: Props) => {
       });
       onSuccess();
       onClose();
-    } catch (error) {
-      console.error("Ошибка при добавлении транзакции", error);
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.detail) {
+        setErrorMessage(error.response.data.detail);
+      } else if (error.message) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage("Произошла неизвестная ошибка");
+      }
     } finally {
+
       setLoading(false);
     }
   };
@@ -93,7 +99,13 @@ const TransactionForm = ({ isOpen, onClose, onSuccess }: Props) => {
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as 'income' | 'expense')}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg fill='gray' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 0.75rem center',
+                  backgroundSize: '1em',
+                }}
                 >
                 <option value="income">Доход</option>
                 <option value="expense">Расход</option>
@@ -104,24 +116,37 @@ const TransactionForm = ({ isOpen, onClose, onSuccess }: Props) => {
               <select
                 value={categoryId ?? ""}
                 onChange={(e) => setCategoryId(Number(e.target.value))}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg fill='gray' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 0.75rem center',
+                  backgroundSize: '1em',
+                }}
               >
-                <option value="">-- Выберите категорию --</option>
+                <option value="">Выберите категорию</option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}
                   </option>
                 ))}
               </select>
+
             </div>
             <div>
                 <label className="block text-sm font-medium text-gray-700">Выберите счёт</label>
                 <select
                     value={accountId}
                     onChange={(e) => setAccountId(Number(e.target.value))}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500  appearance-none"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg fill='gray' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 0.75rem center',
+                      backgroundSize: '1em',
+                    }}
                     >
-                    <option value="">-- Выберите счёт --</option>
+                    <option value="">Выберите счёт</option>
                     {accounts.map((acc) => (
                         <option key={acc.id} value={acc.id}>
                         {acc.name}
@@ -130,6 +155,11 @@ const TransactionForm = ({ isOpen, onClose, onSuccess }: Props) => {
                 </select>
 
             </div>
+            {errorMessage && (
+              <div className="text-red-600 text-sm font-medium">
+                {errorMessage}
+              </div>
+            )}
             <div className="flex justify-end">
               <button
                 type="submit"

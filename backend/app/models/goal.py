@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Float, String, ForeignKey, DateTime, Boolean
+from sqlalchemy import Column, Integer, Float, String, ForeignKey, DateTime, Boolean, Text
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.db import Base
@@ -7,11 +7,9 @@ class Goal(Base):
     __tablename__ = "goals"
 
     id = Column(Integer, primary_key=True, index=True)
-    family_member_id = Column(Integer, ForeignKey("family_members.id"), nullable=False)
-    name = Column(String, nullable=False)
-    target_amount = Column(Float)
-    current_amount = Column(Float, default=0.0)
-    deadline = Column(DateTime)
-    is_completed = Column(Boolean, default=False)
+    title = Column(String, nullable=False)
+    amount = Column(Float, nullable=False)  # сумма цели
+    description = Column(Text, nullable=True)
+    family_id = Column(Integer, ForeignKey("families.id"), nullable=False)
 
-    family_member = relationship("FamilyMember")
+    family = relationship("Family", back_populates="goals")

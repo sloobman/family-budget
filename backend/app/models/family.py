@@ -12,4 +12,6 @@ class Family(Base):
     members = relationship("FamilyMember", back_populates="family")
     savings = relationship("Saving", back_populates="family")
     categories = relationship("Category", back_populates="family")
+    goals = relationship("Goal", back_populates="family", cascade="all, delete")
+
 
