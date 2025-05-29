@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus } from 'lucide-react';
-import { authAPI, familyAPI, userAPI} from '../api/client';
+import { authAPI} from '../api/client';
 
 const AddFamilyMember = () => {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ const AddFamilyMember = () => {
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   setError('');
-
+  
   if (!formData.firstName || !formData.email || !formData.password) {
     setError('Пожалуйста, заполните все обязательные поля');
     return;
@@ -38,30 +38,18 @@ const AddFamilyMember = () => {
 
   try {
     // 1. Создаем пользователя
-    const userResponse = await authAPI.register({
+    await authAPI.registerFamilyMember({
       email: formData.email,
       username: formData.username,
       first_name: formData.firstName,
       last_name: formData.lastName,
       password: formData.password,
-      is_parent: formData.isParent
-    });
-
-    // 2. Получаем или создаем семью
-    
-    const familyResponse = await familyAPI.getMyFamily();
-    
-
-    // 3. Добавляем члена семьи
-    await familyAPI.createFamilyMember({
-      name: formData.firstName,
+      is_parent: false,
       relation: formData.relation,
-      user_id: userResponse.data.id,
-      family_id: familyResponse.data.id
     });
-    await userAPI.updateUserProfile(userResponse.data.id, { 
-    family_id: familyResponse.data.id 
-  });
+
+        
+
     navigate('/family', { state: { successMessage: 'Член семьи успешно добавлен' } });
   } catch (err) {
     setError('Ошибка при добавлении члена семьи. Пожалуйста, попробуйте снова.');
@@ -144,19 +132,7 @@ const AddFamilyMember = () => {
               />
             </div>
 
-            <div>
-                <label htmlFor="isParent" className="block text-sm font-medium text-gray-700 mb-1">
-                    Администратор (может управлять семьей)
-                </label>
-                <input
-                    type="checkbox"
-                    id="isParent"
-                    name="isParent"
-                    checked={formData.isParent}
-                    onChange={(e) => setFormData(prev => ({...prev, isParent: e.target.checked}))}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                </div>
+           
 
 
             <div>

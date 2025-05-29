@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import { Dialog } from "@headlessui/react";
-import { transactionAPI, accountAPI } from "../api/client";
+import { transactionAPI, accountAPI, userAPI, categoryAPI } from "../api/client";
 
 interface Props {
   isOpen: boolean;
@@ -9,13 +11,15 @@ interface Props {
 }
 
 const TransactionForm = ({ isOpen, onClose, onSuccess }: Props) => {
+  const [categoryId, setCategoryId] = useState<number | null>(null);
   const [accounts, setAccounts] = useState<{id: number; name: string}[]>([]);
   const [amount, setAmount] = useState(0);
   const [type, setType] = useState<'income' | 'expense'>('income');
   const [category, setCategory] = useState("");
   const [accountId, setAccountId] = useState<number | "">("");
   const [loading, setLoading] = useState(false);
-  useEffect(() => {
+  const [categories, setCategories] = useState<any[]>([]);
+  useEffect(() => { 
     const fetchAccounts = async () => {
       try {
         const response = await accountAPI.getAccounts(); // пример запроса
@@ -24,8 +28,20 @@ const TransactionForm = ({ isOpen, onClose, onSuccess }: Props) => {
         console.error("Ошибка загрузки счетов:", error);
       }
     };
+    const fetchCategories = async () => {
+        try {
+          const userResponse = await userAPI.getCurrentUser();
+          const familyId = userResponse.data.family_id;
+          const response = await categoryAPI.getCategories(familyId);
+          console.log(response.data);
+          setCategories(response.data);
+        } catch (error) {
+          console.error('Error fetching categories:', error);
+        }
+      };
 
     fetchAccounts();
+    fetchCategories();
   }, []);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,12 +50,15 @@ const TransactionForm = ({ isOpen, onClose, onSuccess }: Props) => {
       alert("Пожалуйста, выберите счёт");
       return;
     }
-
+    if (categoryId === null) {
+      alert("Выберите категорию");
+      return;
+    }
     try {
       await transactionAPI.createTransaction({
           type,
           amount,
-          category,
+          category_id: categoryId,
           account_id: accountId
           
       });
@@ -82,12 +101,18 @@ const TransactionForm = ({ isOpen, onClose, onSuccess }: Props) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">Категория</label>
-              <input
-                type="text"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
+              <select
+                value={categoryId ?? ""}
+                onChange={(e) => setCategoryId(Number(e.target.value))}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              />
+              >
+                <option value="">-- Выберите категорию --</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
                 <label className="block text-sm font-medium text-gray-700">Выберите счёт</label>

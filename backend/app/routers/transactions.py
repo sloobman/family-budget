@@ -4,6 +4,7 @@ from starlette import status
 
 from app.db import get_db
 from app.models import FamilyMember
+from app.models.category import Category
 from app.models.transaction import Transaction
 from app.models.account import Account
 from app.schemas.transaction import TransactionCreate, TransactionResponse
@@ -24,6 +25,17 @@ def create_transaction(
     account = db.query(Account).filter(Account.id == transaction.account_id).first()
     if not account or account.family_member.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="No access to this account")
+        # Проверка категории, если она указана
+    if transaction.category_id:
+        category = db.query(Category).filter(
+            Category.id == transaction.category_id,
+            Category.family_id == current_user.family_id
+        ).first()
+        if not category:
+            raise HTTPException(
+                status_code=400,
+                detail="Category not found or not accessible"
+            )
     # Проверка баланса для расходов
     if transaction.type == "expense" and account.balance < transaction.amount:
         raise HTTPException(status_code=400, detail="Insufficient funds")
@@ -38,6 +50,7 @@ def create_transaction(
     if not family_member:
         raise HTTPException(status_code=404, detail="Family member not found")
 
+
     db_transaction = Transaction(
         **transaction.dict(),
         family_member_id=family_member.id
@@ -45,8 +58,23 @@ def create_transaction(
     db.add(db_transaction)
     db.commit()
 
+    category_info = None
+    if db_transaction.category:
+        category_info = {
+            'id': db_transaction.category.id,
+            'name': db_transaction.category.name
+        }
+
     transaction_data = db_transaction.__dict__
-    transaction_data['currency'] = account.currency
+    transaction_data.update({
+        'currency': account.currency,
+        'family_member': {
+            'id': family_member.id,
+            'name': family_member.name,
+            'relation': family_member.relation,
+        },
+        'category': category_info
+    })
 
 
     return db_transaction

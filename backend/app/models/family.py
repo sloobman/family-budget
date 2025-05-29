@@ -11,4 +11,5 @@ class Family(Base):
     users = relationship("User", back_populates="family")
     members = relationship("FamilyMember", back_populates="family")
     savings = relationship("Saving", back_populates="family")
+    categories = relationship("Category", back_populates="family")
 

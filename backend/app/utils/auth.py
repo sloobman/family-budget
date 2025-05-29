@@ -12,7 +12,7 @@ from app.db import get_db
 # Константы для JWT
 SECRET_KEY = "Ltk_BSR0lmyGs-135-lc7baz1K9kygR6aHrk4lN4ATQ"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 1200
+ACCESS_TOKEN_EXPIRE_MINUTES = 10
 
 # Контекст для хэширования паролей
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

@@ -22,6 +22,7 @@ def create_family_member(
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)
 ):
+    print(current_user.id)
     if not current_user.is_parent:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -49,7 +50,7 @@ def create_family_member(
         name=member.name,
         relation=member.relation,
         user_id=member.user_id,  # Используем user_id из схемы
-        family_id=family_id
+        family_id=current_user.family_id
     )
 
     db.add(db_member)

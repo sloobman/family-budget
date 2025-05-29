@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Wallet } from 'lucide-react';
-import { authAPI, familyAPI } from '../api/client';
+import { authAPI } from '../api/client';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -26,7 +26,7 @@ const Register = () => {
   
   try {
     // 1. Регистрируем пользователя как родителя
-    const userResponse = await authAPI.register({
+   await authAPI.register({
       email: formData.email,
       username: formData.username,
       first_name: formData.firstName,
@@ -35,19 +35,7 @@ const Register = () => {
       is_parent: true
     });
 
-    // 2. Создаем семью
-    const familyResponse = await familyAPI.createFamily({
-      name: `${formData.firstName}'s Family`
-    });
-
-    // 3. Добавляем пользователя как члена семьи
-    await familyAPI.createFamilyMember({
-      name: `${formData.firstName} ${formData.lastName}`,
-      relation: "parent",
-      user_id: userResponse.data.id,
-      family_id: familyResponse.data.id
-    });
-
+   
     navigate('/login');
   } catch (error: any) {
     const detail = error.response?.data?.detail;

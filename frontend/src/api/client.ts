@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 
+
 const api = axios.create({
   baseURL: "http://localhost:8000/api",
 });
@@ -12,6 +13,20 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response?.status === 401) {
+      // Очистка токена из localStorage
+      localStorage.removeItem("token");
+      // Перенаправление на страницу входа
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
+
 
 // Типы
 export interface LoginData {
@@ -27,6 +42,16 @@ export interface RegisterData {
   last_name: string;
   password: string;
   is_parent: boolean;
+}
+
+export interface RegisterFamilyMemberData {
+  email: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  password: string;
+  is_parent: boolean;
+  relation: string;
 }
 
 
@@ -81,11 +106,12 @@ type Currency = 'RUB' | 'USD' | 'EUR';
 export interface TransactionData {
   type: "income" | "expense";
   amount: number;
-  category?: string;
+  category_id: number;   // <-- добавил
   description?: string;
   account_id: number;
-  family_member: MemberData;
+  family_member?: MemberData;
 }
+
 
 export interface UserData {
   email: string;
@@ -97,6 +123,7 @@ export interface UserData {
 
 export const authAPI = {
   register: (data: RegisterData) => api.post('/auth/register', data),
+  registerFamilyMember: (data: RegisterFamilyMemberData) => api.post('/auth/add-family-member', data),
   login: (data: LoginData) =>
   api.post('/auth/login', new URLSearchParams(data as any), {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -106,6 +133,11 @@ export const authAPI = {
 
 };
 
+export const categoryAPI = {
+  getCategories: (familyId: number) => api.get('/categories', { params: { family_id: familyId } }),
+  createCategory: (data: { name: string }) => api.post('/categories', data),
+  deleteCategory: (id: number) => api.delete(`/categories/${id}`),
+};
 
 export const familyAPI = {
   createFamily: (data: { name: string }) => api.post<FamilyData>('/families/', data),

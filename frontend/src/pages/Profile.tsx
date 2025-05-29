@@ -35,10 +35,10 @@ const Profile = () => {
         
         const userResponse = await userAPI.getCurrentUser();
         setUser(userResponse.data);
-
+        //console.log(userResponse);
         // Если у пользователя есть семья, получаем её данные
         if (userResponse.data.family_id) {
-          const familyResponse = await familyAPI.getFamily(userResponse.data.family_id);
+          const familyResponse = await familyAPI.getMyFamily();
           setFamily(familyResponse.data);
         }
       } catch (err) {
