@@ -1,6 +1,4 @@
-from sqlalchemy.orm import declarative_base
-
-Base = declarative_base()
+from app.db import Base
 
 from .user import User
 from .account import Account
@@ -10,3 +8,4 @@ from .goal import Goal
 from .saving import Saving
 from .transaction import Transaction
 from .category import Category
+from .income import Income

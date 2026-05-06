@@ -1,7 +1,8 @@
+import os
+
 from fastapi import FastAPI
 from starlette.responses import JSONResponse
-from routers import goals
-from app.routers import family, accounts, income, auth, family_members, transactions, users, categories
+from app.routers import family, accounts, income, auth, family_members, transactions, users, categories, goals
 from app.db import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -15,15 +16,21 @@ async def handle_insufficient_funds(request, exc):
         status_code=exc.status_code,
         content={"detail": exc.detail}
     )
+
+origins = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:5173,http://127.0.0.1:5173"
+).split(",")
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-Base.metadata.create_all(bind=engine)
 
 
 

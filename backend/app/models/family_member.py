@@ -14,3 +14,4 @@ class FamilyMember(Base):
     user = relationship("User", back_populates="family_members")
     family = relationship("Family", back_populates="members")
     accounts = relationship("Account", back_populates="family_member")
+    incomes = relationship("Income", back_populates="member")
