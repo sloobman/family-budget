@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: family-budget-db
+    environment:
+      POSTGRES_DB: family_budget
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345678
+    expose:
+      - "5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d family_budget"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    image: sloobman/family_budget_backend:1.0.0
+    container_name: family-budget-backend
+    environment:
+      DATABASE_URL: postgresql://postgres:12345678@db:5432/family_budget
+      ALLOWED_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8000"
+    restart: unless-stopped
+  
+  frontend:
+    image: sloobman/family_budget_frontend:1.0.0
+    container_name: family-budget-frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
